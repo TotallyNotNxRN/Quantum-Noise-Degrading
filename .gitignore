@@ -4,4 +4,10 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
-outputs/
+outputs/*
+!outputs/data/
+!outputs/plots/
+outputs/data/*
+outputs/plots/*
+!outputs/data/*.csv
+!outputs/plots/*.svg
