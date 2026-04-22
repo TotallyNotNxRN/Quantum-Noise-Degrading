@@ -1,0 +1,45 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[british]{babel}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[table]{xcolor}
+\usepackage{hyperref}
+\usepackage{cite}
+
+\onehalfspacing
+\graphicspath{{figures/}}
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{0pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!50!black,
+  citecolor=green!40!black,
+  urlcolor=red!50!black,
+  pdftitle={Quantum Noise Sensitivity Mapping Engine},
+  pdfauthor={Author Name}
+}
+
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\ket}[1]{\lvert #1 \rangle}
+\newcommand{\bra}[1]{\langle #1 \rvert}
+\newcommand{\ketbra}[2]{\lvert #1 \rangle \langle #2 \rvert}
+\newcommand{\proj}[1]{\ket{#1}\bra{#1}}
+\newcommand{\FigureOrPlaceholder}[3]{%
+  \IfFileExists{#1}{%
+    \includegraphics[width=0.88\linewidth]{#1}%
+  }{%
+    \fbox{\parbox[c][#2][c]{0.88\linewidth}{\centering #3}}%
+  }%
+}

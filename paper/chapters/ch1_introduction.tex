@@ -1,0 +1,42 @@
+\chapter{Introduction}
+
+Quantum computing derives its potential from nonclassical state structure, particularly superposition and entanglement. These features allow the state space of a system to grow rapidly with qubit number and enable operational effects that do not have classical analogues. Their usefulness, however, depends on maintaining coherence. Real quantum systems are open systems: they interact with surrounding degrees of freedom, and these interactions degrade the quantum properties that computation and communication protocols require \cite{zurek2003decoherence}. The practical challenge is therefore not only to prepare quantum states, but also to understand how quickly and in what manner they lose their defining features under noise.
+
+Noise analysis can be approached at different levels of abstraction. Large software stacks and hardware-oriented toolchains are essential for realistic workflows, but they can also obscure the mathematical structure of the model being used. For many research and educational purposes, there is value in a smaller simulator whose assumptions are explicit and whose implementation can be traced directly back to the underlying equations. The \emph{Quantum Noise Sensitivity Mapping Engine} was built with this goal in mind. It is intentionally small, supports only one to four qubits, avoids external quantum frameworks, and performs state evolution entirely through density matrices and manually defined Kraus operators.
+
+This design choice is not merely stylistic. Density matrices are the correct representation for irreversible noise because open-system channels can transform pure states into mixed states. A pure-state or statevector-only picture is insufficient for such dynamics. Kraus operators provide a mathematically standard and computationally direct method for implementing trace-preserving quantum channels \cite{yu2006kraus}. When these ideas are expressed in a transparent codebase, the simulator becomes more than a numerical utility: it becomes a bridge between open-system quantum theory and reproducible computation.
+
+\section{Research Aim and Objectives}
+
+The present work analyzes this engine as both a scientific model and a software artifact. The primary aim is to determine how different representative quantum states degrade under amplitude damping and phase damping, and how that degradation depends on system size. The states considered are a single-qubit superposition state, a Bell state, and GHZ states with two to four qubits. The channels are applied independently to each qubit, and the resulting states are evaluated using fidelity with respect to the ideal target state and the purity of the noisy density matrix.
+
+The objectives of the study are:
+\begin{enumerate}
+\item to justify the use of density matrices and Kraus operators as the correct formalism for the supported noise models;
+\item to map the mathematical structure of the simulator directly onto the source-code organization;
+\item to quantify how fidelity and purity change across the bundled parameter sweeps;
+\item to evaluate how GHZ-state robustness changes as the number of qubits increases from two to four;
+\item to identify which observed trends are physically meaningful and which follow from the deliberate simplifications of the simulator.
+\end{enumerate}
+
+\section{Project Scope and Delimitations}
+
+Before entering the formal theory and implementation details, it is useful to state clearly what the engine is and what it is not. The README and source code show that the project is a framework-free quantum noise simulator whose principal purpose is to map the sensitivity of a small set of states to two canonical local decoherence channels. All internal state representations are density matrices, all noise is implemented by hand through Kraus operators, and the experiment runner is restricted to a compact suite of bundled studies.
+
+This design reflects four explicit intentions.
+\begin{enumerate}
+\item \textbf{Use density matrices throughout.} The code does not include a statevector pathway, reinforcing the fact that the project is aimed at mixed-state and decoherence analysis rather than unitary-only evolution.
+\item \textbf{Implement channels manually.} The noise model is not delegated to a library call. The simulator constructs Kraus operators directly and embeds them into the full Hilbert space through tensor products.
+\item \textbf{Keep the system small.} The upper bound of four qubits is chosen to avoid the loss of readability that accompanies exponentially growing density matrices.
+\item \textbf{Prioritize transparent data products.} Each bundled experiment writes human-readable CSV data and SVG figures, allowing the user to inspect both the numerical arrays and the rendered trends.
+\end{enumerate}
+
+The engine does not attempt gate-level circuit simulation, does not include hardware calibration, and does not benchmark against full-featured frameworks. Instead, it emphasizes mathematical correctness, interpretability, and extensibility. This report therefore treats the project as a small but rigorous numerical study: one whose value lies not in large-scale simulation, but in its clarity, traceability, and ability to expose the structure of quantum-state degradation under simple local noise models.
+
+\section{Why a Small Simulator Is Methodologically Useful}
+
+In methodological terms, the one-to-four-qubit limit should not be interpreted as a weakness of the project. A density matrix for $n$ qubits has dimension $2^n \times 2^n$, which means the number of matrix elements grows as $4^n$. Within that scaling, even four qubits are sufficient to exhibit genuinely multipartite behavior while still remaining small enough for explicit operator construction, manual inspection, and algebraic verification. The engine therefore occupies a useful middle ground: it is more physically faithful than a pure-state toy model, yet more transparent than a large black-box framework.
+
+\section{Structure of the Report}
+
+The remainder of the report is organized as follows. Chapter~2 develops the theoretical foundations required to understand density-matrix simulation under open-system noise. Chapter~3 maps the mathematics onto the implementation architecture of the engine. Chapter~4 describes the simulation methodology, bundled experiments, and analytical cross-checks used to validate the code. Chapter~5 presents the numerical results obtained from the exported CSV data and generated figures. Chapter~6 interprets those results physically and discusses their significance and limitations. Chapter~7 concludes the study. The appendices provide reproducibility notes, selected analytical and numerical checkpoints, and a module-level walkthrough of the codebase.

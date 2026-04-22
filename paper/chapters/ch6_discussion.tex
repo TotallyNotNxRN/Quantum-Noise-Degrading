@@ -1,0 +1,53 @@
+\chapter{Discussion}
+
+\section{Why Fidelity Degrades Under Both Channels}
+
+Fidelity declines under both amplitude damping and phase damping because both channels reduce the overlap between the evolved state and the initial target state. The two channels do this differently. Amplitude damping changes populations and coherence simultaneously by driving probability mass toward the ground state. Phase damping leaves basis populations unchanged but suppresses off-diagonal structure. In either case, the evolved density matrix departs from the ideal reference, and Eq.~\eqref{eq:fidelity} decreases accordingly. The data confirm this for all bundled studies.
+
+\section{Why Purity Behaves Differently Under the Two Channels}
+
+The purity results show that channel identity matters at least as much as noise magnitude. Under phase damping, purity declines because the channel suppresses coherence without relaxing the state toward a single pure computational-basis outcome. The Bell-state phase-damping curve and the GHZ scaling data both exhibit this behavior. Under amplitude damping, however, the final state can approach the pure ground state $\proj{0}$ or $\proj{00}$ even though that final state differs substantially from the intended target. This is why the single-qubit and Bell-state amplitude-damping curves return to purity $1$ at maximal noise.
+
+This distinction is scientifically important. A state may be pure and yet operationally wrong for the task for which it was prepared. In the present project, strong amplitude damping produces exactly this situation. The final state is pure, but fidelity to the original target state has fallen to $0.5$. The simulator therefore illustrates a useful conceptual lesson: purity is not a proxy for correctness, and fidelity is not a proxy for mixedness.
+
+\section{Entanglement Fragility in the Bell and GHZ Studies}
+
+The Bell and GHZ experiments show how sensitivity increases when the relevant coherence is distributed across multiple qubits. The Bell state already requires phase coherence between $\ket{00}$ and $\ket{11}$. The GHZ family extends this same coherence pattern to larger systems. Under local noise, each additional qubit becomes another site at which coherence can be degraded. This is consistent with the broader literature on entanglement fragility and multiqubit robustness under decoherence \cite{almeida2007entanglement,borras2009robustness}.
+
+The GHZ heatmap makes this scaling effect visually explicit. For phase damping, the coherence factor is multiplied by $(1-\lambda)^n$, so sensitivity increases with qubit number even when the local channel strength is held fixed. The engine therefore provides a concrete numerical demonstration of a general physical principle: global coherence becomes more difficult to preserve as multipartite structure grows.
+
+\section{What Is Physically Meaningful and What Is Simulator-Dependent}
+
+Some conclusions of this study are physically meaningful beyond the code itself. The distinction between dephasing and relaxation, the difference between fidelity and purity, and the scaling vulnerability of GHZ coherence all reflect genuine features of open quantum systems. Other conclusions are tied to the simplifications of the simulator. The independent local-channel assumption, the absence of gate-level dynamics, and the lack of correlated or non-Markovian noise mean that the results should not be interpreted as direct hardware predictions. Instead, they should be interpreted as clean channel-response studies under controlled assumptions.
+
+This distinction is important for scientific honesty. The engine is strong precisely because it is explicit about what it models. It does not claim to be a full-device simulator. What it does provide is a reliable small-scale environment in which the effects of two important local channels can be studied in detail.
+
+\section{Limitations}
+
+The project has several limitations that shape the interpretation of the results:
+\begin{enumerate}
+\item The simulation is restricted to one to four qubits, which prevents direct study of larger multipartite systems.
+\item The engine uses density matrices exclusively and does not provide a statevector pathway for isolated-system comparison.
+\item Only two channels are implemented: amplitude damping and phase damping.
+\item The channels are local and independent; correlated noise is not included.
+\item No non-Markovian memory effects are modeled.
+\item The project is not a gate-level circuit simulator and does not represent algorithmic execution.
+\item No hardware calibration data are incorporated.
+\item The experiment suite is intentionally small and pedagogical, prioritizing clarity over breadth.
+\item No direct comparison against external frameworks is included in the present implementation.
+\end{enumerate}
+
+These limitations do not invalidate the engine. Rather, they define its intended domain: small, transparent, physically interpretable studies of local noise in density-matrix form.
+
+\section{Future Directions}
+
+The code structure suggests several technically natural extensions.
+\begin{enumerate}
+\item \textbf{Additional channels.} Depolarizing, bit-flip, phase-flip, and generalized amplitude-damping models could be added to the noise module without changing the rest of the architecture.
+\item \textbf{Correlated and non-Markovian noise.} Extending the current local-channel model to correlated environments or memory-bearing channels would make the simulator more realistic and would test which of the present trends are robust.
+\item \textbf{Additional state families.} W states, cluster states, and partially entangled states would broaden the notion of robustness beyond Bell and GHZ structure.
+\item \textbf{Additional metrics.} Entanglement-specific measures, trace distance, relative entropy, or quantum Fisher information could supplement fidelity and purity.
+\item \textbf{Repeated schedules.} Applying channels iteratively over multiple rounds would allow the study of cumulative degradation rather than single-pass parameter sweeps.
+\item \textbf{Framework comparison.} Benchmarking equivalent cases against Qiskit or QuTiP would test numerical agreement while clarifying the cost of higher-level abstraction.
+\item \textbf{Larger systems.} Sparse methods, tensor-network approximations, or structured state ans\"atze could extend the present ideas beyond dense four-qubit density matrices.
+\end{enumerate}

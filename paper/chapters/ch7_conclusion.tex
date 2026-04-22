@@ -1,0 +1,7 @@
+\chapter{Conclusion}
+
+The Quantum Noise Sensitivity Mapping Engine is a compact but technically coherent simulator for studying how quantum states degrade under local noise. Its main accomplishment is not scale, but clarity. By representing states as density matrices, implementing Kraus channels manually, validating physicality after evolution, and exporting both raw data and figures, the engine creates a direct connection between quantum-noise theory and reproducible computation.
+
+The experiments show three central findings. First, fidelity decreases with increasing noise in all bundled studies. Second, purity distinguishes amplitude damping from phase damping in a physically meaningful way: dephasing drives states toward mixedness, while strong amplitude damping can restore purity by relaxing the system toward the ground state even as fidelity to the original target continues to fall. Third, GHZ-state robustness decreases with qubit number under phase damping, demonstrating the scaling challenge associated with multipartite coherence.
+
+The implementation is educationally valuable because it makes the mathematics visible in the code, and it is scientifically useful because it produces interpretable sensitivity maps for canonical states under canonical channels. For this class of problem, density-matrix-based simulation is not only sufficient; it is the correct lens through which irreversible quantum noise should be studied.

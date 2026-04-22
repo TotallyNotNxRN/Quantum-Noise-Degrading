@@ -1,0 +1,126 @@
+\chapter{Background and Theoretical Foundations}
+
+\section{Pure States, Mixed States, and the Need for Density Matrices}
+
+A pure quantum state $\ket{\psi}$ may be represented either as a statevector or as the rank-one density matrix
+\begin{equation}
+\rho = \ketbra{\psi}{\psi}.
+\label{eq:pure_density}
+\end{equation}
+This representation becomes indispensable in open-system settings because noise processes generally produce statistical mixtures rather than single pure states. A mixed state is written as
+\begin{equation}
+\rho = \sum_i p_i \ketbra{\psi_i}{\psi_i},
+\qquad
+p_i \ge 0,
+\qquad
+\sum_i p_i = 1.
+\label{eq:mixed_density}
+\end{equation}
+Unlike a statevector, the density matrix can describe incoherent classical uncertainty and decoherence-induced loss of phase information in the same formal object.
+
+The physics of decoherence makes this distinction necessary. Environmental interaction suppresses the off-diagonal structure that encodes coherence and can drive a system away from an intended target state, even in the absence of any measurement by the user \cite{zurek2003decoherence}. Since the present engine is designed specifically to model such irreversible degradation, a density-matrix-only representation is not merely compatible with the goal of the project; it is the appropriate mathematical framework.
+
+\section{Physicality Conditions for Density Matrices}
+
+For a matrix to represent a physical quantum state, three conditions must hold:
+\begin{equation}
+\rho = \rho^\dagger,
+\label{eq:hermitian}
+\end{equation}
+\begin{equation}
+\Tr(\rho) = 1,
+\label{eq:trace_one}
+\end{equation}
+\begin{equation}
+\rho \succeq 0,
+\label{eq:positive}
+\end{equation}
+where Eq.~\eqref{eq:positive} denotes positive semidefiniteness. These conditions have direct computational significance in the project. The metrics module checks Hermiticity numerically, checks that the trace is approximately unity, and computes eigenvalues to ensure that no negative spectrum appears beyond a numerical tolerance. Thus, the code does not merely compute on matrices that are assumed to be physical; it actively verifies that they remain physically admissible after channel application.
+
+\section{Tensor Products and Multipartite State Construction}
+
+Multipartite states are built through tensor products. For computational-basis states,
+\begin{equation}
+\ket{b_1 b_2 \cdots b_n}
+=
+\ket{b_1} \otimes \ket{b_2} \otimes \cdots \otimes \ket{b_n},
+\qquad b_i \in \{0,1\}.
+\label{eq:tensor_basis}
+\end{equation}
+The state-construction module implements this using repeated Kronecker products. This approach is used both for basis-state construction and for the assembly of the supported entangled states. The engine studies:
+\begin{equation}
+\ket{+} = \frac{\ket{0} + \ket{1}}{\sqrt{2}},
+\label{eq:plus_state}
+\end{equation}
+\begin{equation}
+\ket{\Phi^+} = \frac{\ket{00} + \ket{11}}{\sqrt{2}},
+\label{eq:phi_plus}
+\end{equation}
+\begin{equation}
+\ket{\mathrm{GHZ}_n} = \frac{\ket{0\cdots 0} + \ket{1\cdots 1}}{\sqrt{2}},
+\qquad 2 \le n \le 4.
+\label{eq:ghz_n}
+\end{equation}
+Each of these is converted immediately into the density-matrix form of Eq.~\eqref{eq:pure_density}.
+
+\section{Kraus Operators and Channel Action}
+
+The simulator models noise through the operator-sum representation
+\begin{equation}
+\rho' = \sum_k E_k \rho E_k^\dagger,
+\label{eq:kraus_map}
+\end{equation}
+subject to the completeness relation
+\begin{equation}
+\sum_k E_k^\dagger E_k = I.
+\label{eq:kraus_complete}
+\end{equation}
+This representation describes completely positive, trace-preserving evolution and is standard in open-system quantum information theory \cite{yu2006kraus}. Within the present project, it has an additional advantage: it maps naturally onto explicit linear algebra operations and therefore onto short, inspectable Python code.
+
+\section{Amplitude Damping}
+
+Amplitude damping models relaxation from $\ket{1}$ to $\ket{0}$, which may be interpreted as energy loss to an environment. The implementation uses the Kraus set
+\begin{equation}
+E_0^{(A)} =
+\begin{pmatrix}
+1 & 0 \\
+0 & \sqrt{1-\gamma}
+\end{pmatrix},
+\qquad
+E_1^{(A)} =
+\begin{pmatrix}
+0 & \sqrt{\gamma} \\
+0 & 0
+\end{pmatrix},
+\qquad 0 \le \gamma \le 1.
+\label{eq:amp_kraus}
+\end{equation}
+The parameter $\gamma$ is therefore a local damping strength. Because this channel changes populations as well as coherences, it can move a state toward the ground state while simultaneously reducing its overlap with the initial target.
+
+\section{Phase Damping}
+
+Phase damping, also called dephasing, suppresses coherence without changing the computational-basis populations. The project uses the three-operator representation
+\begin{equation}
+E_0^{(P)} = \sqrt{1-\lambda}\,I,
+\qquad
+E_1^{(P)} = \sqrt{\lambda}\,\proj{0},
+\qquad
+E_2^{(P)} = \sqrt{\lambda}\,\proj{1},
+\qquad 0 \le \lambda \le 1.
+\label{eq:phase_kraus}
+\end{equation}
+This channel is especially relevant to GHZ-type states because their nonclassical character depends directly on the off-diagonal coherence between $\ket{0\cdots 0}$ and $\ket{1\cdots 1}$.
+
+\section{Fidelity and Purity}
+
+The engine computes fidelity against a pure reference state and the purity of the evolved density matrix. Since the reference state $\rho_{\mathrm{ideal}}$ is always pure in the bundled experiments, fidelity is evaluated as
+\begin{equation}
+F(\rho,\rho_{\mathrm{ideal}}) = \Tr(\rho \rho_{\mathrm{ideal}}).
+\label{eq:fidelity}
+\end{equation}
+Purity is given by
+\begin{equation}
+P(\rho) = \Tr(\rho^2).
+\label{eq:purity}
+\end{equation}
+These two metrics answer different questions. Fidelity asks whether the state remains close to the intended target, whereas purity asks whether the state remains nearly pure. The results of this project show explicitly that these questions can yield different conclusions for the same noisy evolution.

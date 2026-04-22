@@ -1,0 +1,53 @@
+\chapter{System Design and Implementation Architecture}
+
+\section{Module-by-Module Structure}
+
+The project is architected to follow the mathematical workflow closely. Table~\ref{tab:modules} summarizes the role of each source file.
+
+\begin{table}[t]
+\centering
+\caption{Responsibilities of the main source modules.}
+\label{tab:modules}
+\begin{tabular}{p{3.1cm} p{10.2cm}}
+\toprule
+Module & Main responsibility \\
+\midrule
+\texttt{core/states.py} & Builds basis vectors, tensor products, and the density matrices for the single-qubit superposition, Bell, and GHZ states. \\
+\texttt{core/noise.py} & Defines single-qubit Kraus operators, validates channel parameters, embeds local operators into multipartite Hilbert spaces, applies channels, and numerically stabilizes the output density matrix. \\
+\texttt{core/metrics.py} & Validates physicality and computes fidelity and purity. \\
+\texttt{core/evolve.py} & Selects the requested noise model and applies the channel sequentially to all qubits in the state. \\
+\texttt{experiments/sweep.py} & Performs one-dimensional parameter sweeps over noise strength and scaling sweeps over qubit number. \\
+\texttt{experiments/run\_experiments.py} & Defines the bundled experiments, writes CSV outputs, manages the output directories, and saves plot files. \\
+\texttt{visualization/plots.py} & Generates fidelity curves, purity curves, and the GHZ heatmap using \texttt{matplotlib}. \\
+\texttt{main.py} & Executes the full experiment suite and prints the saved file paths. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Data Flow Through the Engine}
+
+The internal data flow can be described as a sequence of mathematically interpretable steps:
+\begin{enumerate}
+\item construct an ideal state as a density matrix;
+\item define the local Kraus operators for the selected channel;
+\item expand each local operator into the full Hilbert space;
+\item apply the channel sequentially to each qubit;
+\item numerically stabilize the result and check physicality;
+\item compute fidelity and purity;
+\item repeat across parameter grids;
+\item export arrays and figures.
+\end{enumerate}
+
+This flow is reflected directly in the directory structure. The design avoids unnecessary abstraction layers, which is a significant methodological advantage for a project that is meant to be read, verified, and extended by users who want to understand the mechanics of noisy density-matrix evolution rather than merely invoke it.
+
+\section{Framework-Free Implementation and Its Significance}
+
+The project deliberately avoids Qiskit, QuTiP, and other quantum libraries. This matters for two reasons. First, the resulting code makes the mathematical content explicit. The amplitude-damping matrices, phase-damping matrices, tensor products, and trace operations appear plainly in the source, which makes validation and review easier. Second, the absence of an external framework forces the project to confront numerical details directly, such as trace renormalization, Hermiticity restoration, and shape checks. In a larger framework these details are often handled internally; here they are visible and therefore open to scrutiny.
+
+\section{The Four-Qubit Limit as a Methodological Choice}
+
+The upper limit of four qubits is often easy to misread as a lack of ambition. In reality, it is part of the project methodology. Because a density matrix has $4^n$ entries, even moderate increases in qubit number rapidly obscure the exact operator structure of the simulation. The four-qubit limit ensures that the engine remains computationally manageable and, more importantly, analytically inspectable. This allows the bundled studies to be checked directly against closed-form reasoning, which is one of the strongest features of the present implementation.
+
+\section{How the Architecture Mirrors the Mathematics}
+
+The value of the codebase lies not only in what it computes, but also in how directly it exposes the mathematics. State preparation is separated from noise definition, noise definition is separated from evolution, and evolution is separated from metric evaluation. That separation makes it possible to inspect each stage independently. A user can verify the state constructors without needing to inspect the plotting code, can check the Kraus operators without traversing the experiment runner, and can trace any reported fidelity or purity value back through a short chain of deterministic functions. This structure is one reason the project is suitable for both technical study and extension.

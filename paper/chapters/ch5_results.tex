@@ -1,0 +1,82 @@
+\chapter{Results}
+
+\section{Single-Qubit Amplitude Damping}
+
+The single-qubit experiment sweeps the amplitude-damping strength across 51 equally spaced points from $0$ to $1$. Figure~\ref{fig:single_fidelity} shows the fidelity relative to the initial $\ket{+}$ state, and Figure~\ref{fig:single_purity} shows the purity of the evolved density matrix.
+
+The saved data in the single-qubit amplitude sweep CSV file show that fidelity decreases monotonically throughout the sweep. The fidelity is approximately $1.0000$ at $\gamma=0$, $0.99497$ at $\gamma=0.02$, $0.94721$ at $\gamma=0.20$, $0.85355$ at $\gamma=0.50$, and $0.5000$ at $\gamma=1.00$. The purity follows a different trajectory. It begins at $1.0000$, falls to $0.9200$ at $\gamma=0.20$, reaches $0.8750$ at $\gamma=0.50$, and then rises back to $1.0000$ at $\gamma=1.00$. Thus, the numerical output exhibits monotonic fidelity loss but non-monotonic purity.
+
+These values are consistent with the exact expressions in Eqs.~\eqref{eq:single_amp_fidelity} and \eqref{eq:single_amp_purity}. The CSV output is therefore not only internally consistent as data, but also analytically consistent with the channel model actually implemented in the code.
+
+\begin{figure}[t]
+\centering
+\FigureOrPlaceholder{figures/single_qubit_amplitude_fidelity.pdf}{2.6in}{Single-qubit amplitude-damping fidelity plot}
+\caption{Fidelity of the single-qubit superposition state under amplitude damping. The plotted values are generated from \texttt{outputs/data/single\_qubit\_amplitude\_sweep.csv}.}
+\label{fig:single_fidelity}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\FigureOrPlaceholder{figures/single_qubit_amplitude_purity.pdf}{2.6in}{Single-qubit amplitude-damping purity plot}
+\caption{Purity of the single-qubit superposition state under amplitude damping. The curve decreases initially and then rises back to $1$ at maximal damping.}
+\label{fig:single_purity}
+\end{figure}
+
+\section{Bell State Noise Comparison}
+
+The Bell-state experiment compares amplitude damping and phase damping using the same parameter grid. Figure~\ref{fig:bell_fidelity} shows the fidelity curves, while Figure~\ref{fig:bell_purity} shows the purity curves.
+
+The most striking feature of this dataset is that the Bell-state fidelity curves under amplitude damping and phase damping are numerically identical up to floating-point precision across the full sweep. A direct comparison of the two CSV files gives a maximum absolute fidelity difference of approximately $2.22 \times 10^{-16}$, which is a numerical zero at double precision. At the midpoint of the sweep, both channels yield a fidelity of $0.6250$, and at maximal noise both give $0.5000$.
+
+The purity curves do not coincide. Under amplitude damping, the Bell-state purity begins at $1.0000$, decreases to $0.5625$ at $\gamma=0.50$, and returns to $1.0000$ at $\gamma=1.00$. Under phase damping, the purity begins at $1.0000$, decreases to $0.53125$ at $\lambda=0.50$, and reaches $0.5000$ at $\lambda=1.00$. The maximum absolute difference between the two purity curves is $0.5$, attained at maximal noise. Thus, the experiment reveals a strong channel dependence in mixedness despite identical target-state fidelity values.
+
+\begin{figure}[t]
+\centering
+\FigureOrPlaceholder{figures/bell_state_fidelity_comparison.pdf}{2.6in}{Bell-state fidelity comparison plot}
+\caption{Bell-state fidelity under amplitude damping and phase damping. In the saved data, the two curves are numerically identical over the sampled parameter range.}
+\label{fig:bell_fidelity}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\FigureOrPlaceholder{figures/bell_state_purity_comparison.pdf}{2.6in}{Bell-state purity comparison plot}
+\caption{Bell-state purity under amplitude damping and phase damping. Unlike fidelity, purity separates the relaxation channel from the dephasing channel clearly.}
+\label{fig:bell_purity}
+\end{figure}
+
+\section{GHZ Scaling Study}
+
+The GHZ scaling study fixes the phase-damping parameter at $\lambda=0.35$ and evaluates GHZ states of size $n=2$, $3$, and $4$. The resulting fidelity and purity values are written to \texttt{outputs/data/ghz\_phase\_scaling.csv} and visualized in Figure~\ref{fig:ghz_scaling}.
+
+The saved numerical values show a systematic decline in robustness as the number of qubits increases. Fidelity decreases from $0.71125$ at $n=2$ to $0.6373125$ at $n=3$ and $0.589253125$ at $n=4$. Purity decreases in parallel, from $0.589253125$ to $0.5377094453125$ and then to $0.5159322406445312$. These values agree exactly with Eqs.~\eqref{eq:ghz_phase_fidelity} and \eqref{eq:ghz_phase_purity} evaluated at $\lambda=0.35$.
+
+The broader heatmap, stored in \texttt{outputs/data/ghz\_phase\_fidelity\_heatmap.csv} and shown in Figure~\ref{fig:ghz_heatmap}, extends the same trend across the entire parameter range. At every sampled nonzero phase-noise value, larger GHZ systems have lower fidelity than smaller ones. For instance, at $\lambda=0.20$ the fidelities are $0.8200$, $0.7560$, and $0.7048$ for $n=2$, $3$, and $4$, respectively. At $\lambda=0.50$, they are $0.6250$, $0.5625$, and $0.53125$. At $\lambda=0.80$, they are $0.5200$, $0.5040$, and $0.5008$. The heatmap therefore shows both parameter sensitivity and size sensitivity within the same visualization.
+
+\begin{table}[t]
+\centering
+\caption{GHZ scaling results under phase damping at fixed $\lambda = 0.35$.}
+\label{tab:ghz_scaling}
+\begin{tabular}{ccc}
+\toprule
+Number of qubits $n$ & Fidelity & Purity \\
+\midrule
+2 & 0.71125 & 0.589253125 \\
+3 & 0.6373125 & 0.5377094453125 \\
+4 & 0.589253125 & 0.5159322406445312 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\FigureOrPlaceholder{figures/ghz_phase_scaling.pdf}{2.7in}{GHZ scaling plot}
+\caption{Fidelity and purity of GHZ states under phase damping at fixed $\lambda=0.35$. Both quantities decrease as qubit number increases from two to four.}
+\label{fig:ghz_scaling}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\FigureOrPlaceholder{figures/ghz_phase_fidelity_heatmap.pdf}{3.0in}{GHZ phase-damping heatmap}
+\caption{Fidelity heatmap for GHZ states under phase damping. The horizontal axis is the noise strength, the vertical axis is the qubit number, and the color scale represents fidelity.}
+\label{fig:ghz_heatmap}
+\end{figure}

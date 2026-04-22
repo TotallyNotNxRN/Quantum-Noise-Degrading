@@ -1,0 +1,159 @@
+\chapter{Methodology and Analytical Validation}
+
+\section{Simulation Workflow}
+
+The complete simulation procedure implemented by the project is as follows:
+\begin{enumerate}
+\item Construct the ideal state vector in the computational basis.
+\item Convert the ideal state to a density matrix.
+\item Build the single-qubit Kraus operators for the chosen noise channel.
+\item Embed each single-qubit Kraus operator into the full $n$-qubit Hilbert space using tensor products.
+\item Apply the local channel independently and sequentially to each qubit.
+\item Symmetrize the output matrix and renormalize its trace.
+\item Validate Hermiticity, unit trace, and positive semidefiniteness numerically.
+\item Compute fidelity and purity.
+\item Sweep the noise parameter or the qubit count according to the experiment definition.
+\item Save the numerical outputs as CSV files and generate SVG plot files.
+\end{enumerate}
+
+This workflow is not merely conceptual; it corresponds directly to the actual control flow of \texttt{states.py}, \texttt{noise.py}, \texttt{evolve.py}, \texttt{metrics.py}, \texttt{sweep.py}, and \texttt{run\_experiments.py}.
+
+\section{Exact States Used in the Bundled Experiments}
+
+The experiments are built around three concrete state families:
+\begin{itemize}
+\item the single-qubit $\ket{+}$ state of Eq.~\eqref{eq:plus_state},
+\item the Bell state $\ket{\Phi^+}$ of Eq.~\eqref{eq:phi_plus},
+\item GHZ states $\ket{\mathrm{GHZ}_n}$ for $n=2,3,4$ from Eq.~\eqref{eq:ghz_n}.
+\end{itemize}
+No additional states are included in the current engine. The GHZ constructor itself enforces the range $2 \le n \le 4$, so the upper bound is an actual code-level restriction and not simply a statement in the documentation.
+
+\section{Multi-Qubit Channel Application}
+
+For an $n$-qubit density matrix $\rho$, the code first computes the expected dimension $2^n \times 2^n$ and verifies that the input matrix has the correct shape. For each qubit index $j$, every single-qubit Kraus operator $E_k$ is lifted to
+\begin{equation}
+\widetilde{E}_{k,j} = I \otimes \cdots \otimes I \otimes E_k \otimes I \otimes \cdots \otimes I,
+\label{eq:lifted_kraus}
+\end{equation}
+and the update
+\begin{equation}
+\rho \mapsto \sum_k \widetilde{E}_{k,j} \rho \widetilde{E}_{k,j}^\dagger
+\end{equation}
+is performed. The evolved state is then passed to the next qubit. In other words, the implementation realizes independent local noise by composing local channels sequentially across the qubit register.
+
+\section{Bundled Experiment Suite}
+
+The project defines three experiments. Their numerical configuration is fixed in \texttt{run\_experiments.py} and summarized in Table~\ref{tab:experiments}.
+
+\begin{table}[t]
+\centering
+\caption{Numerical configuration of the bundled experiments.}
+\label{tab:experiments}
+\begin{tabular}{p{3.2cm} p{2.3cm} p{3.2cm} p{5.1cm}}
+\toprule
+Experiment & State(s) & Channel(s) & Parameter specification \\
+\midrule
+Single-qubit amplitude study & $\ket{+}$ & Amplitude damping & $\gamma = 0.00, 0.02, \dots, 1.00$ (51 values) \\
+Bell-state comparison & $\ket{\Phi^+}$ & Amplitude damping and phase damping & $\gamma, \lambda = 0.00, 0.02, \dots, 1.00$ (51 values each) \\
+GHZ scaling study & $\ket{\mathrm{GHZ}_n}$, $n=2,3,4$ & Phase damping & fixed $\lambda = 0.35$ for scaling; $\lambda = 0.00, 0.02, \dots, 1.00$ for heatmap \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The single-qubit experiment isolates the effect of amplitude damping on a minimal coherent superposition. The Bell comparison holds the initial state fixed and changes the channel type. The GHZ study changes system size while holding the channel structure fixed, making it the engine's direct scaling experiment.
+
+\section{Output Generation}
+
+Each experiment writes numerical results using \texttt{numpy.savetxt}. The line-sweep CSV files contain columns for the noise parameter, fidelity, and purity. The GHZ heatmap CSV stores the noise parameters in the first row and the qubit counts in the first column, with the fidelity matrix occupying the interior. Plot generation is delegated to \texttt{visualization/plots.py}. Fidelity and purity sweeps are plotted as line graphs, and the GHZ heatmap is rendered via \texttt{pcolormesh}, with the heatmap axes computed from cell-edge coordinates rather than raw sample points.
+
+\section{Analytical Cross-Checks Derived from the Implemented Model}
+
+One of the advantages of the small system size is that several of the bundled results can be derived in closed form directly from the implemented channels. These derivations are not additional experiments; they are analytical checks of the same model realized by the code.
+
+\subsection{Single-Qubit Amplitude Damping}
+
+Applying Eq.~\eqref{eq:amp_kraus} to the initial density matrix $\rho_+ = \proj{+}$ gives
+\begin{equation}
+\rho_+^{(A)}(\gamma)
+=
+\frac{1}{2}
+\begin{pmatrix}
+1+\gamma & \sqrt{1-\gamma} \\
+\sqrt{1-\gamma} & 1-\gamma
+\end{pmatrix}.
+\label{eq:single_amp_exact}
+\end{equation}
+From Eqs.~\eqref{eq:fidelity} and \eqref{eq:purity}, the fidelity and purity are
+\begin{equation}
+F_+^{(A)}(\gamma) = \frac{1 + \sqrt{1-\gamma}}{2},
+\label{eq:single_amp_fidelity}
+\end{equation}
+\begin{equation}
+P_+^{(A)}(\gamma) = 1 - \frac{\gamma}{2} + \frac{\gamma^2}{2}.
+\label{eq:single_amp_purity}
+\end{equation}
+Equation~\eqref{eq:single_amp_purity} explains the curvature observed in the saved CSV output: the purity reaches its minimum at $\gamma = 0.5$ and then increases again as the state relaxes toward $\proj{0}$.
+
+\subsection{Bell State Under Amplitude Damping}
+
+For the Bell state $\ket{\Phi^+}$, the local amplitude-damping channel on both qubits produces the density matrix
+\begin{equation}
+\rho_{\Phi^+}^{(A)}(\gamma)
+=
+\frac{1}{2}
+\begin{pmatrix}
+1+\gamma^2 & 0 & 0 & 1-\gamma \\
+0 & \gamma(1-\gamma) & 0 & 0 \\
+0 & 0 & \gamma(1-\gamma) & 0 \\
+1-\gamma & 0 & 0 & (1-\gamma)^2
+\end{pmatrix}.
+\label{eq:bell_amp_exact}
+\end{equation}
+The resulting fidelity and purity are
+\begin{equation}
+F_{\Phi^+}^{(A)}(\gamma)
+=
+1 - \gamma + \frac{\gamma^2}{2},
+\label{eq:bell_amp_fidelity}
+\end{equation}
+\begin{equation}
+P_{\Phi^+}^{(A)}(\gamma)
+=
+1 - 2\gamma + 3\gamma^2 - 2\gamma^3 + \gamma^4.
+\label{eq:bell_amp_purity}
+\end{equation}
+These expressions match the symmetric purity curve observed in the amplitude-damping CSV output.
+
+\subsection{Bell and GHZ States Under Phase Damping}
+
+Because the Bell state is a two-qubit GHZ state, local phase damping yields a simple general pattern. For the GHZ family,
+\begin{equation}
+\rho_{\mathrm{GHZ}_n}^{(P)}(\lambda)
+=
+\frac{1}{2}\proj{0\cdots 0}
++
+\frac{1}{2}\proj{1\cdots 1}
++
+\frac{(1-\lambda)^n}{2}\ketbra{0\cdots 0}{1\cdots 1}
++
+\frac{(1-\lambda)^n}{2}\ketbra{1\cdots 1}{0\cdots 0}.
+\label{eq:ghz_phase_exact}
+\end{equation}
+The off-diagonal term acquires a factor $(1-\lambda)^n$ because each local dephasing step multiplies coherence by $(1-\lambda)$. The corresponding fidelity and purity are
+\begin{equation}
+F_{\mathrm{GHZ}_n}^{(P)}(\lambda)
+=
+\frac{1 + (1-\lambda)^n}{2},
+\label{eq:ghz_phase_fidelity}
+\end{equation}
+\begin{equation}
+P_{\mathrm{GHZ}_n}^{(P)}(\lambda)
+=
+\frac{1 + (1-\lambda)^{2n}}{2}.
+\label{eq:ghz_phase_purity}
+\end{equation}
+For $n=2$, Eqs.~\eqref{eq:ghz_phase_fidelity} and \eqref{eq:ghz_phase_purity} describe the Bell-state phase-damping output exactly. These closed forms also reproduce the entire GHZ heatmap and the fixed-$\lambda$ scaling table.
+
+\section{Validation Logic in the Code}
+
+The simulator includes explicit numerical safeguards beyond the analytic channel definitions. After channel application, the state is symmetrized to suppress tiny anti-Hermitian floating-point artifacts, renormalized to trace one, and later checked for Hermiticity, trace preservation, and non-negative eigenvalues within tolerance. This validation layer matters because a density-matrix simulator is only scientifically useful if the intermediate numerical representation remains physically admissible. In this project, that requirement is enforced rather than assumed.

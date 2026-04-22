@@ -11,3 +11,10 @@ outputs/data/*
 outputs/plots/*
 !outputs/data/*.csv
 !outputs/plots/*.svg
+
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.synctex.gz

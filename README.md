@@ -97,20 +97,20 @@ The code also checks that density matrices remain physical:
 
 ```text
 project/
-|-- core/
-|   |-- states.py
-|   |-- noise.py
-|   |-- metrics.py
-|   `-- evolve.py
-|-- experiments/
-|   |-- sweep.py
-|   `-- run_experiments.py
-|-- visualization/
-|   `-- plots.py
-|-- outputs/
-|   |-- data/
-|   `-- plots/
-`-- main.py
+├── core/
+│   ├── states.py
+│   ├── noise.py
+│   ├── metrics.py
+│   └── evolve.py
+├── experiments/
+│   ├── sweep.py
+│   └── run_experiments.py
+├── visualization/
+│   └── plots.py
+├── outputs/
+│   ├── data/
+│   └── plots/
+└── main.py
 ```
 
 ### File Guide

@@ -1,0 +1,45 @@
+\chapter{Selected Numerical and Analytical Checkpoints}
+
+To support manual inspection of the saved data, Table~\ref{tab:selected_points} lists representative checkpoints drawn directly from the CSV outputs.
+
+\begin{table}[t]
+\centering
+\caption{Selected numerical checkpoints from the exported CSV files.}
+\label{tab:selected_points}
+\begin{tabular}{p{4.2cm} p{2.4cm} c c}
+\toprule
+Study & Parameter value & Fidelity & Purity \\
+\midrule
+Single-qubit amplitude damping & $\gamma = 0.00$ & 1.0000 & 1.0000 \\
+Single-qubit amplitude damping & $\gamma = 0.50$ & 0.85355 & 0.8750 \\
+Single-qubit amplitude damping & $\gamma = 1.00$ & 0.5000 & 1.0000 \\
+Bell amplitude damping & $\gamma = 0.50$ & 0.6250 & 0.5625 \\
+Bell phase damping & $\lambda = 0.50$ & 0.6250 & 0.53125 \\
+GHZ phase damping ($n = 2$) & $\lambda = 0.35$ & 0.71125 & 0.589253125 \\
+GHZ phase damping ($n = 3$) & $\lambda = 0.35$ & 0.6373125 & 0.5377094453125 \\
+GHZ phase damping ($n = 4$) & $\lambda = 0.35$ & 0.589253125 & 0.5159322406445312 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:closed_forms} links selected exact expressions to the numerical behavior reported in the main body of the report.
+
+\begin{table}[t]
+\centering
+\caption{Closed-form expressions used to validate the bundled simulations.}
+\label{tab:closed_forms}
+\begin{tabular}{p{4.7cm} p{8.2cm}}
+\toprule
+Case & Exact expression \\
+\midrule
+Single-qubit amplitude fidelity & $F_+^{(A)}(\gamma) = \dfrac{1 + \sqrt{1-\gamma}}{2}$ \\
+Single-qubit amplitude purity & $P_+^{(A)}(\gamma) = 1 - \dfrac{\gamma}{2} + \dfrac{\gamma^2}{2}$ \\
+Bell amplitude fidelity & $F_{\Phi^+}^{(A)}(\gamma) = 1 - \gamma + \dfrac{\gamma^2}{2}$ \\
+Bell amplitude purity & $P_{\Phi^+}^{(A)}(\gamma) = 1 - 2\gamma + 3\gamma^2 - 2\gamma^3 + \gamma^4$ \\
+GHZ phase fidelity & $F_{\mathrm{GHZ}_n}^{(P)}(\lambda) = \dfrac{1 + (1-\lambda)^n}{2}$ \\
+GHZ phase purity & $P_{\mathrm{GHZ}_n}^{(P)}(\lambda) = \dfrac{1 + (1-\lambda)^{2n}}{2}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These formulas are not separate theoretical embellishments. They are derived from the same Kraus maps implemented in the simulator and therefore provide direct validation of the code path used to generate the CSV outputs.

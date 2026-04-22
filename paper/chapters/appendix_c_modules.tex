@@ -1,0 +1,27 @@
+\chapter{Module Walkthrough}
+
+This appendix connects specific mathematical roles to specific source locations.
+
+\section{\texttt{core/states.py}}
+
+This module defines the basis-state constructor, the density-matrix conversion routine, a general tensor-product utility, and the three supported state families. The GHZ constructor enforces the range $2 \le n \le 4$, making the qubit limit an executable rule rather than a documentation remark.
+
+\section{\texttt{core/noise.py}}
+
+This module contains the core channel logic. It validates that $\gamma$ and $\lambda$ remain in $[0,1]$, defines the Kraus operators of Eqs.~\eqref{eq:amp_kraus} and \eqref{eq:phase_kraus}, embeds single-qubit operators into $n$-qubit space, and stabilizes the resulting density matrix by restoring Hermiticity and renormalizing the trace.
+
+\section{\texttt{core/metrics.py}}
+
+This module checks the physicality conditions of Eqs.~\eqref{eq:hermitian}--\eqref{eq:positive} numerically and computes the fidelity and purity values used throughout the experiment suite.
+
+\section{\texttt{core/evolve.py}}
+
+This module performs the actual state evolution under local noise. It chooses the channel based on the string label \texttt{"amplitude"} or \texttt{"phase"}, verifies the system dimension, and then applies the local channel to each qubit sequentially.
+
+\section{\texttt{experiments/sweep.py}}
+
+This module packages the evolution logic into reusable sweeps. It supports both parameter sweeps over channel strength and scaling sweeps over qubit number. It also allows both zero-argument and one-argument state constructors, which is why the same sweep code can handle both the fixed Bell-state function and the parameterized GHZ-state function.
+
+\section{\texttt{experiments/run\_experiments.py} and \texttt{visualization/plots.py}}
+
+Together, these modules define the bundled studies, write the CSV outputs, generate the plots, and keep the output directory organized. The heatmap writer stores the matrix together with labeled axes, allowing direct reuse in later analysis.
